@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Card = require('../models/card');
 
 function handleError(err, res) {
@@ -35,9 +36,13 @@ module.exports.createCard = (req, res) => {
 };
 
 module.exports.deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.id)
+  if (!mongoose.isValidObjectId(req.params.cardId)) {
+    return res.status(400).json({ message: 'Некорректные данные карточки' });
+  }
+  Card.findByIdAndRemove(req.params.cardId)
     .then((card) => handle404(card, res))
     .catch((err) => handleError(err, res));
+  return null; // устраняет ошибку ESLint
 };
 
 module.exports.likeCard = (req, res) => {
