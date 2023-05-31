@@ -19,14 +19,13 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getUserById = (req, res) => {
-  User.findById(req.params.id)
+  User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
         // Если пользователь не найден
         return res.status(404).send({ message: 'Пользователь не найден' });
       }
 
-      // Формирование объекта с данными пользователя
       const userData = {
         name: user.name,
         about: user.about,
@@ -47,7 +46,7 @@ module.exports.createUser = (req, res) => {
 };
 
 module.exports.updateUser = (req, res) => {
-  User.findByIdAndUpdate(req.user._id, req.body, { new: true })
+  User.findByIdAndUpdate(req.user._id, req.body, { new: true, runValidators: true })
     .then((updatedUser) => {
       if (!updatedUser) {
         // Если пользователь не найден
@@ -59,8 +58,8 @@ module.exports.updateUser = (req, res) => {
 };
 
 module.exports.updateAvatar = (req, res) => {
-  const { link } = req.body;
-  User.findByIdAndUpdate(req.user._id, { link }, { new: true })
+  const { avatar } = req.body;
+  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .then((updatedUser) => {
       if (!updatedUser) {
         // Если пользователь не найден

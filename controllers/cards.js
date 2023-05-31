@@ -6,6 +6,7 @@ function handleError(err, res) {
     return res.status(400).send({ message: 'Запрашиваемая кароточка не найдена' });
   } if (err.name === 'ValidationError') {
     // Обработка ошибки при некорректных данных
+    console.log(err.errors);
     return res.status(400).send({ message: 'Некорректные данные карточки' });
   }
   // Обработка остальных ошибок
@@ -27,7 +28,8 @@ module.exports.getCards = (req, res) => {
 
 module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
-  Card.create({ name, link })
+  const owner = req.user._id;
+  Card.create({ name, link, owner })
     .then((card) => res.send({ data: card }))
     .catch((err) => handleError(err, res));
 };
