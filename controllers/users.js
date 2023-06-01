@@ -1,15 +1,19 @@
 const User = require('../models/user');
 
+const BadReques = 400;
+const NotFound = 404;
+const ServerError = 500;
+
 function handleError(err, res) {
   if (err.name === 'CastError') {
     // Обработка ошибки при неверном формате идентификатора пользователя
-    return res.status(400).send({ message: 'Запрашиваемый пользователь не найден' });
+    return res.status(BadReques).send({ message: 'Запрашиваемый пользователь не найден' });
   } if (err.name === 'ValidationError') {
     // Обработка ошибки при некорректных данных
-    return res.status(400).send({ message: 'Некорректные данные пользователя' });
+    return res.status(BadReques).send({ message: 'Некорректные данные пользователя' });
   }
   // Обработка остальных ошибок
-  return res.status(500).send({ message: `Произошла ошибка: ${err.message}` });
+  return res.status(ServerError).send({ message: 'Внутренняя ошибка сервера' });
 }
 
 module.exports.getUsers = (req, res) => {
@@ -23,7 +27,7 @@ module.exports.getUserById = (req, res) => {
     .then((user) => {
       if (!user) {
         // Если пользователь не найден
-        return res.status(404).send({ message: 'Пользователь не найден' });
+        return res.status(NotFound).send({ message: 'Пользователь не найден' });
       }
 
       const userData = {
@@ -50,7 +54,7 @@ module.exports.updateUser = (req, res) => {
     .then((updatedUser) => {
       if (!updatedUser) {
         // Если пользователь не найден
-        return res.status(404).send({ message: 'Пользователь не найден' });
+        return res.status(NotFound).send({ message: 'Пользователь не найден' });
       }
       return res.send({ data: updatedUser });
     })
@@ -63,7 +67,7 @@ module.exports.updateAvatar = (req, res) => {
     .then((updatedUser) => {
       if (!updatedUser) {
         // Если пользователь не найден
-        return res.status(404).send({ message: 'Пользователь не найден' });
+        return res.status(NotFound).send({ message: 'Пользователь не найден' });
       }
       return res.send({ data: updatedUser });
     })

@@ -1,22 +1,25 @@
 const mongoose = require('mongoose');
 const Card = require('../models/card');
 
+const BadReques = 400;
+const NotFound = 404;
+const ServerError = 500;
+
 function handleError(err, res) {
   if (err.name === 'CastError') {
     // Обработка ошибки при неверном формате идентификатора пользователя
-    return res.status(400).send({ message: 'Запрашиваемая кароточка не найдена' });
+    return res.status(BadReques).send({ message: 'Запрашиваемая кароточка не найдена' });
   } if (err.name === 'ValidationError') {
     // Обработка ошибки при некорректных данных
-    console.log(err.errors);
-    return res.status(400).send({ message: 'Некорректные данные карточки' });
+    return res.status(BadReques).send({ message: 'Некорректные данные карточки' });
   }
   // Обработка остальных ошибок
-  return res.status(500).send({ message: `Произошла ошибка: ${err.message}` });
+  return res.status(ServerError).send({ message: 'Внутренняя ошибка сервера' });
 }
 
 function handle404(card, res) {
   if (!card) {
-    return res.status(404).send({ message: 'Карточка не найдена' });
+    return res.status(NotFound).send({ message: 'Карточка не найдена' });
   }
   return res.send({ data: card });
 }
@@ -36,8 +39,12 @@ module.exports.createCard = (req, res) => {
 };
 
 module.exports.deleteCard = (req, res) => {
-  if (!mongoose.isValidObjectId(req.params.cardId)) {
-    return res.status(400).json({ message: 'Некорректные данные карточки' });
+  if (!mongoose.isValidObjectId(req.params.cardId)) { // тут у меня произошла проблеиа,
+    // так как в тесте есть проверка на отсутствие карточки по определенному айди
+    // и проверка на некорректно введеный айди, не совсем понятно в чем отличие.
+    // Получается тут проверка что введено именно айди а не слово какое-нибудь.
+    // Причем без этой проверки тест не проходился
+    return res.status(BadReques).json({ message: 'Некорректные данные карточки' });
   }
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => handle404(card, res))
