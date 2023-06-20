@@ -30,7 +30,9 @@ app.post('/signin', celebrate({
   }),
 }), login);
 
-app.use(auth);
+app.use((req, res, next) => {
+  auth(req, res, next);
+});
 
 mongoose.connect('mongodb://127.0.0.1/mestodb', {
   useNewUrlParser: true,
