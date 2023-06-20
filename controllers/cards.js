@@ -1,20 +1,11 @@
-const mongoose = require('mongoose');
 const Card = require('../models/card');
 
-const BadReques = 400;
+const Forbidden = 403;
 const NotFound = 404;
-const ServerError = 500;
 
-function handleError(err, res) {
-  if (err.name === 'CastError') {
-    // Обработка ошибки при неверном формате идентификатора пользователя
-    return res.status(BadReques).send({ message: 'Запрашиваемая кароточка не найдена' });
-  } if (err.name === 'ValidationError') {
-    // Обработка ошибки при некорректных данных
-    return res.status(BadReques).send({ message: 'Некорректные данные карточки' });
-  }
-  // Обработка остальных ошибок
-  return res.status(ServerError).send({ message: 'Внутренняя ошибка сервера' });
+function handleError(err, res, next) {
+  res.locals.controllerType = 'card';
+  next(err);
 }
 
 function handle404(card, res) {
@@ -39,17 +30,25 @@ module.exports.createCard = (req, res) => {
 };
 
 module.exports.deleteCard = (req, res) => {
-  if (!mongoose.isValidObjectId(req.params.cardId)) { // тут у меня произошла проблеиа,
-    // так как в тесте есть проверка на отсутствие карточки по определенному айди
-    // и проверка на некорректно введеный айди, не совсем понятно в чем отличие.
-    // Получается тут проверка что введено именно айди а не слово какое-нибудь.
-    // Причем без этой проверки тест не проходился
-    return res.status(BadReques).json({ message: 'Некорректные данные карточки' });
-  }
-  Card.findByIdAndRemove(req.params.cardId)
-    .then((card) => handle404(card, res))
+  const userId = req.user._id;
+
+  Card.findById(req.params.cardId)
+    .then((card) => {
+      if (!card) {
+        return res.status(NotFound).send({ message: 'Карточка не найдена' });
+      }
+
+      // Проверяем, является ли текущий пользователь владельцем карточки
+      if (card.owner !== userId) {
+        return res.status(Forbidden).send({ message: 'У вас нет прав на удаление этой карточки' });
+      }
+
+      // Пользователь является владельцем карточки, можно выполнить удаление
+      return Card.findByIdAndRemove(req.params.cardId)
+        .then(() => res.send({ data: card }))
+        .catch((err) => handleError(err, res));
+    })
     .catch((err) => handleError(err, res));
-  return null; // устраняет ошибку ESLint
 };
 
 module.exports.likeCard = (req, res) => {
