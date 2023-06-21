@@ -8,7 +8,6 @@ const userSchema = new mongoose.Schema({
     default: 'Жак-Ив Кусто', // оно должно быть у каждого пользователя, так что имя — обязательное поле
     minlength: 2, // минимальная длина имени — 2 символа
     maxlength: 30, // а максимальная — 30 символов
-    select: false,
   },
   about: {
     type: String,
@@ -44,14 +43,18 @@ userSchema.statics.findUserByCredentials = function (email, password) {
     .then((user) => {
       // не нашёлся — отклоняем промис
       if (!user) {
-        return Promise.reject(new Error('Неправильные почта или пароль'));
+        const error = new Error('Неправильные почта или пароль');
+        error.name = 'UnauthorizedError';
+        throw error;
       }
 
       // нашёлся — сравниваем хеши
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            return Promise.reject(new Error('Неправильные почта или пароль'));
+            const error = new Error('Неправильные почта или пароль');
+            error.name = 'UnauthorizedError';
+            throw error;
           }
 
           return user; // теперь user доступен

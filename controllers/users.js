@@ -22,7 +22,6 @@ module.exports.login = (req, res, next) => {
       res.send({ token });
     })
     .catch((err) => {
-      // ошибка аутентификации
       handleError(err, res, next);
     });
 };

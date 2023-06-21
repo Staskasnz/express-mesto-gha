@@ -7,7 +7,6 @@ const ServerError = 500;
 module.exports.errorHandler = (err, req, res, next) => {
   let statusCode = ServerError;
   let message = 'Внутренняя ошибка сервера';
-  console.log(res.locals);
 
   if (res.locals.controllerType === 'user') {
     if (err.code === 11000) {
