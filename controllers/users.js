@@ -62,7 +62,9 @@ module.exports.createUser = (req, res, next) => {
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     }))
-    .then((user) => res.send({ data: user.toObject({ select: '-password' }) }))
+    .then((user) => {
+      res.send({ data: user.toObject({ useProjection: true }) });
+    })
     .catch((err) => handleError(err, res, next));
 };
 
