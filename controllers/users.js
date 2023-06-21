@@ -39,7 +39,6 @@ module.exports.getUserById = (req, res, next) => {
         // Если пользователь не найден
         return res.status(NotFound).send({ message: 'Пользователь не найден' });
       }
-
       const userData = {
         name: user.name,
         about: user.about,

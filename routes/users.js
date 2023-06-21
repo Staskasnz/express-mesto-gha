@@ -6,13 +6,13 @@ const {
 
 router.get('/', getUsers);
 
+router.get('/me', getUserById);
+
 router.get('/:userId', celebrate({
   params: Joi.object().keys({
     userId: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required(),
   }),
 }), getUserById);
-
-router.get('/me', getUserById);
 
 router.patch('/me', celebrate({
   body: Joi.object().keys({
