@@ -12,7 +12,11 @@ router.post('/', celebrate({
   }),
 }), createCard);
 router.delete('/:cardId', deleteCard);
-router.put('/:cardId/likes', likeCard);
+router.put('/:cardId/likes', celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required(),
+  }),
+}), likeCard);
 router.delete('/:cardId/likes', dislikeCard);
 
 module.exports = router;
