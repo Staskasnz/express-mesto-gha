@@ -40,7 +40,7 @@ module.exports.deleteCard = (req, res) => {
 
       // Проверяем, является ли текущий пользователь владельцем карточки
       if (card.owner !== userId) {
-        return res.status(Forbidden).send({ message: 'У вас нет прав на удаление этой карточки' });
+        return res.status(Forbidden).send({ message: 'У вас нет прав на удаление этой карточки', userId });
       }
 
       // Пользователь является владельцем карточки, можно выполнить удаление
