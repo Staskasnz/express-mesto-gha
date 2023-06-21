@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-module.exports = (req, res, next) => {
+module.exports.auth = (req, res, next) => {
   // достаём авторизационный заголовок
   const { authorization } = req.headers;
   const Unauthorized = 401;
