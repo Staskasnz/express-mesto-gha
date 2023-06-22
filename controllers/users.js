@@ -51,6 +51,25 @@ module.exports.getUserById = (req, res, next) => {
     .catch((err) => handleError(err, res, next));
 };
 
+module.exports.getCurrentUser = (req, res, next) => {
+  User.findById(req.user._id)
+    .then((user) => {
+      if (!user) {
+        // Если пользователь не найден
+        return res.status(NotFound).send({ message: 'Пользователь не найден' });
+      }
+      const userData = {
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+        _id: user._id,
+      };
+
+      return res.send(userData);
+    })
+    .catch((err) => handleError(err, res, next));
+};
+
 module.exports.createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
