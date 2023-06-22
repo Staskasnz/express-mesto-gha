@@ -58,14 +58,14 @@ module.exports.getCurrentUser = (req, res, next) => {
         // Если пользователь не найден
         return res.status(NotFound).send({ message: 'Пользователь не найден' });
       }
-      const userData = {
-        name: user.name,
-        about: user.about,
-        avatar: user.avatar,
-        _id: user._id,
-      };
+      // const userData = {
+      //   name: user.name,
+      //   about: user.about,
+      //   avatar: user.avatar,
+      //   _id: user._id,
+      // };
 
-      return res.send(userData);
+      return res.send(user);
     })
     .catch((err) => handleError(err, res, next));
 };
