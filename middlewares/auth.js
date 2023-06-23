@@ -18,6 +18,7 @@ module.exports.auth = (req, res, next) => {
     payload = jwt.verify(token, 'some-secret-key');
   } catch (e) {
     // отправим ошибку, если не получилось
+    console.log('я тут');
     next(new UnauthorizedError('Некорректный токен'));
   }
 

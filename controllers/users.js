@@ -69,7 +69,7 @@ module.exports.createUser = (req, res, next) => {
       res.send({ data: user.toObject({ useProjection: true }) });
     })
     .catch((err) => {
-      if (err.name === 'ConflictError') {
+      if (err.code === 11000) {
         next(new ConflictError('Пользователь с таким email уже зарегистрирован'));
       } else {
         next(err);
