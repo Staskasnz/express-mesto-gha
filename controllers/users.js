@@ -1,13 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-
-const NotFound = 404;
-
-function handleError(err, res, next) {
-  res.locals.controllerType = 'user';
-  next(err);
-}
+const { NotFoundError, BadRequestError } = require('../errors/errors');
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
@@ -21,15 +15,13 @@ module.exports.login = (req, res, next) => {
       // вернём токен
       res.send({ token });
     })
-    .catch((err) => {
-      handleError(err, res, next);
-    });
+    .catch(next);
 };
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch((err) => handleError(err, res, next));
+    .catch(next);
 };
 
 module.exports.getUserById = (req, res, next) => {
@@ -37,7 +29,7 @@ module.exports.getUserById = (req, res, next) => {
     .then((user) => {
       if (!user) {
         // Если пользователь не найден
-        return res.status(NotFound).send({ message: 'Пользователь не найден' });
+        throw new NotFoundError('Нет пользователя с таким id');
       }
       const userData = {
         name: user.name,
@@ -48,7 +40,7 @@ module.exports.getUserById = (req, res, next) => {
 
       return res.send(userData);
     })
-    .catch((err) => handleError(err, res, next));
+    .catch(next);
 };
 
 module.exports.getCurrentUser = (req, res, next) => {
@@ -56,18 +48,12 @@ module.exports.getCurrentUser = (req, res, next) => {
     .then((user) => {
       if (!user) {
         // Если пользователь не найден
-        return res.status(NotFound).send({ message: 'Пользователь не найден' });
+        throw new NotFoundError('Нет пользователя с таким id');
       }
-      // const userData = {
-      //   name: user.name,
-      //   about: user.about,
-      //   avatar: user.avatar,
-      //   _id: user._id,
-      // };
 
       return res.send(user);
     })
-    .catch((err) => handleError(err, res, next));
+    .catch(next);
 };
 
 module.exports.createUser = (req, res, next) => {
@@ -82,7 +68,13 @@ module.exports.createUser = (req, res, next) => {
     .then((user) => {
       res.send({ data: user.toObject({ useProjection: true }) });
     })
-    .catch((err) => handleError(err, res, next));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new BadRequestError('Некорректные данные карточки'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 module.exports.updateUser = (req, res, next) => {
@@ -90,11 +82,11 @@ module.exports.updateUser = (req, res, next) => {
     .then((updatedUser) => {
       if (!updatedUser) {
         // Если пользователь не найден
-        return res.status(NotFound).send({ message: 'Пользователь не найден' });
+        throw new NotFoundError('Нет пользователя с таким id');
       }
       return res.send({ data: updatedUser });
     })
-    .catch((err) => handleError(err, res, next));
+    .catch(next);
 };
 
 module.exports.updateAvatar = (req, res, next) => {
@@ -103,9 +95,9 @@ module.exports.updateAvatar = (req, res, next) => {
     .then((updatedUser) => {
       if (!updatedUser) {
         // Если пользователь не найден
-        return res.status(NotFound).send({ message: 'Пользователь не найден' });
+        throw new NotFoundError('Нет пользователя с таким id');
       }
       return res.send({ data: updatedUser });
     })
-    .catch((err) => handleError(err, res, next));
+    .catch(next);
 };

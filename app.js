@@ -6,6 +6,8 @@ const { celebrate, Joi, errors } = require('celebrate');
 const { createUser, login } = require('./controllers/users');
 const { auth } = require('./middlewares/auth');
 const { errorHandler } = require('./middlewares/error-handler');
+const urlRegex = require('./regex/url-regex');
+const { NotFoundError } = require('./errors/errors');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -18,7 +20,7 @@ app.post('/signup', celebrate({
     email: Joi.string().required().email(),
     password: Joi.string().required().min(5),
     name: Joi.string().min(2).max(30),
-    avatar: Joi.string().pattern(/^https?:\/\/(?:www\.)?[a-zA-Z0-9-._~:/?#[\]@!$&'()*+,;=]+#?$/),
+    avatar: Joi.string().pattern(urlRegex),
     about: Joi.string().min(2).max(30),
   }),
 }), createUser);
@@ -42,8 +44,8 @@ mongoose.connect('mongodb://127.0.0.1/mestodb', {
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
-app.use((req, res) => {
-  res.status(404).json({ message: 'Запрашиваемый путь не найден' });
+app.use((req, res, next) => {
+  next(new NotFoundError('Запрашиваемый путь не найден'));
 });
 
 app.use(errors());
