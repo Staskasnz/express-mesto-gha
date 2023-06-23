@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const { NotFoundError, BadRequestError } = require('../errors/errors');
+const { NotFoundError, ConflictError } = require('../errors/errors');
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
@@ -69,8 +69,8 @@ module.exports.createUser = (req, res, next) => {
       res.send({ data: user.toObject({ useProjection: true }) });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new BadRequestError('Некорректные данные карточки'));
+      if (err.name === 'ConflictError') {
+        next(new ConflictError('Пользователь с таким email уже зарегистрирован'));
       } else {
         next(err);
       }
