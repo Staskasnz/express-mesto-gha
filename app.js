@@ -7,7 +7,7 @@ const { createUser, login } = require('./controllers/users');
 const { auth } = require('./middlewares/auth');
 const { errorHandler } = require('./middlewares/error-handler');
 const urlRegex = require('./regex/url-regex');
-const { NotFoundError } = require('./errors/errors');
+const NotFoundError = require('./errors/notfound-error');
 
 const { PORT = 3000 } = process.env;
 const app = express();
