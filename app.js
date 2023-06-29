@@ -10,38 +10,39 @@ const { errorHandler } = require('./middlewares/error-handler');
 const urlRegex = require('./regex/url-regex');
 const NotFoundError = require('./errors/notfound-error');
 
-// const allowedCors = [
-//   'https://praktikum.tk',
-//   'http://praktikum.tk',
-//   'localhost:3000',
-//   'https://staskasnz.nomoreparties.sbs',
-//   'https://api.staskasnz.nomoreparties.sbs',
-// ];
+const allowedCors = [
+  'https://praktikum.tk',
+  'http://praktikum.tk',
+  'localhost:3000',
+  'https://staskasnz.nomoreparties.sbs',
+  'https://api.staskasnz.nomoreparties.sbs',
+];
 
 const { PORT = 3000 } = process.env;
 const app = express();
 
-// app.use((req, res, next) => {
-//   const { origin } = req.headers;
+app.use((req, res, next) => {
+  const { origin } = req.headers;
+  const { method } = req; // Сохраняем тип запроса (HTTP-метод) в соответствующую переменную
 
-//   const { method } = req; // Сохраняем тип запроса (HTTP-метод) в соответствующую переменную
+  console.log(origin);
+  console.log(method);
+  // Значение для заголовка Access-Control-Allow-Methods по умолчанию (разрешены все типы запросов)
+  const requestHeaders = req.headers['access-control-request-headers'];
 
-//   // Значение для заголовка Access-Control-Allow-Methods по умолчанию (разрешены все типы запросов)
-//   const requestHeaders = req.headers['access-control-request-headers'];
+  // Если это предварительный запрос, добавляем нужные заголовки
+  if (method === 'OPTIONS') {
+    // разрешаем кросс-доменные запросы с этими заголовками
+    res.header('Access-Control-Allow-Headers', requestHeaders);
+    // завершаем обработку запроса и возвращаем результат клиенту
+    return res.end();
+  }
+  if (allowedCors.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
 
-//   // Если это предварительный запрос, добавляем нужные заголовки
-//   if (method === 'OPTIONS') {
-//     // разрешаем кросс-доменные запросы с этими заголовками
-//     res.header('Access-Control-Allow-Headers', requestHeaders);
-//     // завершаем обработку запроса и возвращаем результат клиенту
-//     return res.end();
-//   }
-//   if (allowedCors.includes(origin)) {
-//     res.header('Access-Control-Allow-Origin', origin);
-//   }
-
-//   return next();
-// });
+  return next();
+});
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
