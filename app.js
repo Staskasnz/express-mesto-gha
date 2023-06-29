@@ -14,20 +14,26 @@ const allowedCors = [
   'https://praktikum.tk',
   'http://praktikum.tk',
   'localhost:3000',
-  'https://staskasnz.nomoreparties.sbs/sign-in',
-  'https://api.staskasnz.nomoreparties.sbs/sign-in',
+  'https://staskasnz.nomoreparties.sbs',
+  'https://api.staskasnz.nomoreparties.sbs',
 ];
 
 const { PORT = 3000 } = process.env;
 const app = express();
 
 app.use((req, res, next) => {
-  const { origin } = req.headers; // Сохраняем источник запроса в переменную origin
-  // проверяем, что источник запроса есть среди разрешённых
+  const { origin, method } = req.headers;
+
   if (allowedCors.includes(origin)) {
-    // устанавливаем заголовок, который разрешает браузеру запросы с этого источника
-    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Origin', origin);
   }
+
+  if (method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    return res.status(200).end();
+  }
+
   next();
 });
 
