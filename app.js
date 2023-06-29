@@ -6,6 +6,7 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const { createUser, login } = require('./controllers/users');
 const { auth } = require('./middlewares/auth');
+const { cors } = require('cors');
 const { errorHandler } = require('./middlewares/error-handler');
 const urlRegex = require('./regex/url-regex');
 const NotFoundError = require('./errors/notfound-error');
@@ -18,7 +19,7 @@ const allowedCors = [
   'https://api.staskasnz.nomoreparties.sbs',
 ];
 
-const { PORT = 3000 } = process.env;
+const { PORT = 3001 } = process.env;
 const app = express();
 
 app.use((req, res, next) => {
