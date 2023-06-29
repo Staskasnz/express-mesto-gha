@@ -22,19 +22,25 @@ const { PORT = 3000 } = process.env;
 const app = express();
 
 app.use((req, res, next) => {
-  const { origin, method } = req.headers;
+  const { origin } = req.headers;
 
+  const { method } = req; // Сохраняем тип запроса (HTTP-метод) в соответствующую переменную
+
+  // Значение для заголовка Access-Control-Allow-Methods по умолчанию (разрешены все типы запросов)
+  const requestHeaders = req.headers['access-control-request-headers'];
+
+  // Если это предварительный запрос, добавляем нужные заголовки
+  if (method === 'OPTIONS') {
+    // разрешаем кросс-доменные запросы с этими заголовками
+    res.header('Access-Control-Allow-Headers', requestHeaders);
+    // завершаем обработку запроса и возвращаем результат клиенту
+    return res.end();
+  }
   if (allowedCors.includes(origin)) {
     res.header('Access-Control-Allow-Origin', origin);
   }
 
-  if (method === 'OPTIONS') {
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    return res.status(200).end();
-  }
-
-  next();
+  return next();
 });
 
 app.use(bodyParser.json());
