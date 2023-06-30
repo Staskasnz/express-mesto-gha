@@ -2,48 +2,50 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { celebrate, Joi, errors } = require('celebrate');
+const cors = require('cors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-
 const { createUser, login } = require('./controllers/users');
 const { auth } = require('./middlewares/auth');
-const { cors } = require('cors');
+
 const { errorHandler } = require('./middlewares/error-handler');
 const urlRegex = require('./regex/url-regex');
 const NotFoundError = require('./errors/notfound-error');
 
-const allowedCors = [
-  'https://praktikum.tk',
-  'http://praktikum.tk',
-  'localhost:3000',
-  'https://staskasnz.nomoreparties.sbs',
-  'https://api.staskasnz.nomoreparties.sbs',
-];
+// const allowedCors = [
+//   'https://praktikum.tk',
+//   'http://praktikum.tk',
+//   'localhost:3000',
+//   'https://staskasnz.nomoreparties.sbs',
+//   'https://api.staskasnz.nomoreparties.sbs',
+// ];
 
 const { PORT = 3001 } = process.env;
 const app = express();
 
-app.use((req, res, next) => {
-  const { origin } = req.headers;
-  const { method } = req; // Сохраняем тип запроса (HTTP-метод) в соответствующую переменную
+app.use(cors());
 
-  console.log(origin);
-  console.log(method);
-  // Значение для заголовка Access-Control-Allow-Methods по умолчанию (разрешены все типы запросов)
-  const requestHeaders = req.headers['access-control-request-headers'];
+// app.use((req, res, next) => {
+//   const { origin } = req.headers;
+//   const { method } = req; // Сохраняем тип запроса (HTTP-метод) в соответствующую переменную
 
-  // Если это предварительный запрос, добавляем нужные заголовки
-  if (method === 'OPTIONS') {
-    // разрешаем кросс-доменные запросы с этими заголовками
-    res.header('Access-Control-Allow-Headers', requestHeaders);
-    // завершаем обработку запроса и возвращаем результат клиенту
-    return res.end();
-  }
-  if (allowedCors.includes(origin)) {
-    res.header('Access-Control-Allow-Origin', origin);
-  }
+//   console.log(origin);
+//   console.log(method);
+//   // Значение для заголовка Access-Control-Allow-Methods по умолчанию
+//   const requestHeaders = req.headers['access-control-request-headers'];
 
-  return next();
-});
+//   // Если это предварительный запрос, добавляем нужные заголовки
+//   if (method === 'OPTIONS') {
+//     // разрешаем кросс-доменные запросы с этими заголовками
+//     res.header('Access-Control-Allow-Headers', requestHeaders);
+//     // завершаем обработку запроса и возвращаем результат клиенту
+//     return res.end();
+//   }
+//   if (allowedCors.includes(origin)) {
+//     res.header('Access-Control-Allow-Origin', origin);
+//   }
+
+//   return next();
+// });
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));

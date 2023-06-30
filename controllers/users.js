@@ -13,7 +13,6 @@ module.exports.login = (req, res, next) => {
       // аутентификация успешна! пользователь в переменной user
       // создадим токен
       const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
-
       // вернём токен
       res.send({ token });
     })
