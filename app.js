@@ -7,10 +7,10 @@ const cors = require('cors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { createUser, login } = require('./controllers/users');
 const { auth } = require('./middlewares/auth');
-
 const { errorHandler } = require('./middlewares/error-handler');
 const urlRegex = require('./regex/url-regex');
 const NotFoundError = require('./errors/notfound-error');
+const { DB_ADDRESS } = require('./config');
 
 // const allowedCors = [
 //   'https://praktikum.tk',
@@ -53,6 +53,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(requestLogger);
 
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
+
 app.post('/signup', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
@@ -74,7 +80,7 @@ app.use((req, res, next) => {
   auth(req, res, next);
 });
 
-mongoose.connect('mongodb://127.0.0.1/mestodb', {
+mongoose.connect(DB_ADDRESS, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });

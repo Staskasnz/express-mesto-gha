@@ -4,6 +4,7 @@ const User = require('../models/user');
 const NotFoundError = require('../errors/notfound-error');
 const BadRequestError = require('../errors/badrequest-error');
 const ConflictError = require('../errors/server-error');
+const JWT_SECRET = require('../config');
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
@@ -12,7 +13,7 @@ module.exports.login = (req, res, next) => {
     .then((user) => {
       // аутентификация успешна! пользователь в переменной user
       // создадим токен
-      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      const token = jwt.sign({ _id: user._id }, process.env.NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
       // вернём токен
       res.send({ token });
     })
