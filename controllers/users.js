@@ -4,10 +4,13 @@ const User = require('../models/user');
 const NotFoundError = require('../errors/notfound-error');
 const BadRequestError = require('../errors/badrequest-error');
 const ConflictError = require('../errors/server-error');
-const JWT_SECRET = require('../config');
+const { JWT_SECRET } = require('../config');
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
+
+  console.log(process.env.NODE_ENV === 'production');
+  console.log(JWT_SECRET);
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
