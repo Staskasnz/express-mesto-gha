@@ -9,9 +9,6 @@ const { JWT_SECRET } = require('../config');
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
-  console.log(process.env.NODE_ENV === 'production');
-  console.log(JWT_SECRET);
-
   return User.findUserByCredentials(email, password)
     .then((user) => {
       // аутентификация успешна! пользователь в переменной user
