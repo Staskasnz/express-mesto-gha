@@ -4,7 +4,6 @@ const UnauthorizedError = require('../errors/unauthorized-error');
 module.exports.auth = (req, res, next) => {
   // достаём авторизационный заголовок
   const { authorization } = req.headers;
-  console.log(req.headers);
   // убеждаемся, что он есть или начинается с Bearer
   if (!authorization || !authorization.startsWith('Bearer ')) {
     throw new UnauthorizedError('Некорректный токен');

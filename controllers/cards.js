@@ -7,12 +7,12 @@ function handle404(card, res) {
   if (!card) {
     throw new NotFoundError('Карточка не найдена');
   }
-  return res.send({ data: card });
+  return res.send(card);
 }
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
-    .then((cards) => res.send({ data: cards }))
+    .then((cards) => { res.send(cards); })
     .catch(next);
 };
 
@@ -20,7 +20,7 @@ module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user._id;
   Card.create({ name, link, owner })
-    .then((card) => res.send({ data: card }))
+    .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Некорректные данные при создании карточки'));
@@ -46,7 +46,7 @@ module.exports.deleteCard = (req, res, next) => {
 
       // Пользователь является владельцем карточки, можно выполнить удаление
       return Card.findByIdAndRemove(req.params.cardId)
-        .then(() => res.send({ data: card }))
+        .then(() => res.send(card))
         .catch(next);
     })
     .catch(next);
